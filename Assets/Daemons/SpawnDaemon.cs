@@ -6,6 +6,8 @@ public class SpawnDaemon : MonoBehaviour, ISpawnerTarget
 {
     public GameObject blockPrefab;
 
+    public GameObject destroyPrefab;
+
     private GameState gameState;
 
     // Start is called before the first frame update
@@ -20,6 +22,10 @@ public class SpawnDaemon : MonoBehaviour, ISpawnerTarget
         if (currentBlock != null) {
             currentBlock.name = "";
             gameState.SetBlock(currentBlock);
+
+            foreach(Transform child in currentBlock.transform) {
+            Instantiate(destroyPrefab, child.position, Quaternion.identity);
+            }
         }
 
         var newBlock = new GameObject(Constants.CURRENT_BLOCK_NAME);        

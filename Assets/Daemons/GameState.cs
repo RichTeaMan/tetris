@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class GameState : MonoBehaviour
 {
@@ -14,9 +15,12 @@ public class GameState : MonoBehaviour
 
     private HashSet<Point> setBlocks = new HashSet<Point>();
 
+    private GameObject daemon;
+
     // Start is called before the first frame update
     void Start()
     {
+        daemon = GameObject.Find("Daemon");
         // create grid walls
         var grid = new GameObject("GridWalls");
         foreach (var y in Enumerable.Range(0, Height))
@@ -117,7 +121,7 @@ public class GameState : MonoBehaviour
 
     public bool CanRotateCounterClockwise(GameObject block)
     {
-      int originX = Convert.ToInt32(block.transform.position.x);
+        int originX = Convert.ToInt32(block.transform.position.x);
         int originY = Convert.ToInt32(block.transform.position.y);
         foreach (Transform child in block.transform)
         {
@@ -135,6 +139,19 @@ public class GameState : MonoBehaviour
             }
         }
         return true;
+    }
+
+    public void Gravity()
+    {
+        var currentBlock = GameObject.Find(Constants.CURRENT_BLOCK_NAME);
+        if (CanMoveDown(currentBlock))
+        {
+            ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.MoveDown());
+        }
+        else
+        {
+            ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
+        }
     }
 
     public void SetBlock(GameObject block)

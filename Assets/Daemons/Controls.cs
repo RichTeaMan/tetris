@@ -12,8 +12,6 @@ public class Controls : MonoBehaviour
 
     private bool movementLocked = false;
 
-    private bool dropRequested = false;
-
     private GameState gameState;
 
     private GameObject daemon;
@@ -31,17 +29,7 @@ public class Controls : MonoBehaviour
         // drop
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            dropRequested = true;
-        }
-
-        if (movementLocked)
-        {
-            return;
-        }
-        if (dropRequested)
-        {
             ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
-            dropRequested = false;
             return;
         }
 
@@ -59,64 +47,29 @@ public class Controls : MonoBehaviour
 
         if (Input.GetKey(KeyCode.DownArrow) && gameState.CanMoveDown(currentBlock))
         {
-            var targetPosition = (Vector3.down * blockMove) + currentBlock.transform.position;
-            StartCoroutine(MoveBlock(currentBlock, targetPosition));
+            ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.MoveDown());
         }
 
         if (Input.GetKey(KeyCode.LeftArrow) && gameState.CanMoveLeft(currentBlock))
         {
-            var targetPosition = (Vector3.left * blockMove) + currentBlock.transform.position;
-            StartCoroutine(MoveBlock(currentBlock, targetPosition));
+            ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.MoveLeft());
         }
 
         if (Input.GetKey(KeyCode.RightArrow) && gameState.CanMoveRight(currentBlock))
         {
-            var targetPosition = (Vector3.right * blockMove) + currentBlock.transform.position;
-            StartCoroutine(MoveBlock(currentBlock, targetPosition));
+            ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.MoveRight());
         }
 
         // rotate clockwise
         if (Input.GetKey(KeyCode.X) && gameState.CanRotateClockwise(currentBlock))
         {
-            var q = Quaternion.FromToRotation(Vector3.up, Vector3.right) * currentBlock.transform.rotation;
-            StartCoroutine(RotateBlock(currentBlock, q));
+            ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.RotateClockwise());
         }
 
         // rotate counter clockwise
         if (Input.GetKey(KeyCode.Z) && gameState.CanRotateCounterClockwise(currentBlock))
         {
-            var q = Quaternion.FromToRotation(Vector3.up, Vector3.left) * currentBlock.transform.rotation;
-            StartCoroutine(RotateBlock(currentBlock, q));
+            ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.RotateCounterClockwise());
         }
-    }
-
-    private IEnumerator MoveBlock(GameObject currentBlock, Vector3 targetPosition)
-    {
-        movementLocked = true;
-        float timeElapsed = 0;
-        Vector3 startPosition = currentBlock.transform.position;
-        while (timeElapsed < duration)
-        {
-            currentBlock.transform.position = Vector3.Lerp(startPosition, targetPosition, timeElapsed / duration);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-        currentBlock.transform.position = targetPosition;
-        movementLocked = false;
-    }
-
-    private IEnumerator RotateBlock(GameObject currentBlock, Quaternion targetRotation)
-    {
-        movementLocked = true;
-        float timeElapsed = 0;
-        Quaternion startRotation = currentBlock.transform.rotation;
-        while (timeElapsed < duration)
-        {
-            currentBlock.transform.rotation = Quaternion.Lerp(startRotation, targetRotation, timeElapsed / duration);
-            timeElapsed += Time.deltaTime;
-            yield return null;
-        }
-        currentBlock.transform.rotation = targetRotation;
-        movementLocked = false;
     }
 }
