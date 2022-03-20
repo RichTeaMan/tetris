@@ -1,16 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Controls : MonoBehaviour
 {
-    
-    float duration = 0.25f;
 
-    float blockMove = 1.0f;
+    private float duration = 0.25f;
+
+    private float blockMove = 1.0f;
 
     private bool movementLocked = false;
-    
+
+    private bool dropRequested = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,7 +23,21 @@ public class Controls : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (movementLocked) {
+        // drop
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            dropRequested = true;
+        }
+
+        if (movementLocked)
+        {
+            return;
+        }
+        if (dropRequested)
+        {
+            var daemon = GameObject.Find("Daemon");
+            ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
+            dropRequested = false;
             return;
         }
 
@@ -67,6 +84,8 @@ public class Controls : MonoBehaviour
             var q = Quaternion.FromToRotation(Vector3.up, Vector3.left) * currentBlock.transform.rotation;
             StartCoroutine(RotateBlock(currentBlock, q));
         }
+
+
     }
 
     private IEnumerator MoveBlock(GameObject currentBlock, Vector3 targetPosition)
