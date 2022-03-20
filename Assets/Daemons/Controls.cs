@@ -76,14 +76,14 @@ public class Controls : MonoBehaviour
         }
 
         // rotate clockwise
-        if (Input.GetKey(KeyCode.X))
+        if (Input.GetKey(KeyCode.X) && gameState.CanRotateClockwise(currentBlock))
         {
             var q = Quaternion.FromToRotation(Vector3.up, Vector3.right) * currentBlock.transform.rotation;
             StartCoroutine(RotateBlock(currentBlock, q));
         }
 
         // rotate counter clockwise
-        if (Input.GetKey(KeyCode.Z))
+        if (Input.GetKey(KeyCode.Z) && gameState.CanRotateCounterClockwise(currentBlock))
         {
             var q = Quaternion.FromToRotation(Vector3.up, Vector3.left) * currentBlock.transform.rotation;
             StartCoroutine(RotateBlock(currentBlock, q));

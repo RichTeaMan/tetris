@@ -25,10 +25,10 @@ public class SpawnDaemon : MonoBehaviour, ISpawnerTarget
         var newBlock = new GameObject(Constants.CURRENT_BLOCK_NAME);        
 
         var subs = new[] {
+            Instantiate(blockPrefab, new Vector3(0, -1, 0), Quaternion.identity, newBlock.transform),
             Instantiate(blockPrefab, new Vector3(0, 0, 0), Quaternion.identity, newBlock.transform),
             Instantiate(blockPrefab, new Vector3(0, 1, 0), Quaternion.identity, newBlock.transform),
-            Instantiate(blockPrefab, new Vector3(0, 2, 0), Quaternion.identity, newBlock.transform),
-            Instantiate(blockPrefab, new Vector3(0, 3, 0), Quaternion.identity, newBlock.transform)
+            Instantiate(blockPrefab, new Vector3(0, 2, 0), Quaternion.identity, newBlock.transform)
         };
         var spawnPoint = gameState.FetchSpawnPoint();
         newBlock.transform.position = spawnPoint;
