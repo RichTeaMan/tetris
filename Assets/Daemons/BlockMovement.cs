@@ -6,11 +6,13 @@ using UnityEngine.EventSystems;
 public class BlockMovement : MonoBehaviour, IBlockMovement
 {
 
-    private float duration = 0.25f;
+    private float duration = 0.16f;
 
     private float blockMove = 1.0f;
 
     private bool movementLocked = false;
+
+    private bool gravity = false;
 
     private GameState gameState;
 
@@ -26,6 +28,16 @@ public class BlockMovement : MonoBehaviour, IBlockMovement
     // Update is called once per frame
     void Update()
     {
+        if (gravity && !movementLocked)
+        {
+            gameState.Gravity();
+            gravity = false;
+        }
+    }
+
+    public void Gravity()
+    {
+        gravity = true;
     }
 
     public void MoveDown()
@@ -82,6 +94,8 @@ public class BlockMovement : MonoBehaviour, IBlockMovement
         var q = Quaternion.FromToRotation(Vector3.up, Vector3.left) * currentBlock.transform.rotation;
         StartCoroutine(RotateBlock(currentBlock, q));
     }
+
+    //public void MoveBlocksDown(GameObject[] blocks){}
 
     private IEnumerator MoveBlock(GameObject currentBlock, Vector3 targetPosition)
     {

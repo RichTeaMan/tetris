@@ -2,6 +2,8 @@ using UnityEngine.EventSystems;
 
 public interface IBlockMovement : IEventSystemHandler
 {
+    void Gravity();
+
     void MoveDown();
 
     void MoveLeft();

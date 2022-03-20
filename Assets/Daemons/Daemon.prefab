@@ -90,6 +90,7 @@ MonoBehaviour:
   Height: 20
   Width: 10
   blockPrefab: {fileID: 7885672676497553557, guid: f4613c691e0f20247b82ef554cdd5c9c, type: 3}
+  destroyPrefab: {fileID: 9213381314464430854, guid: 9828383f22bd46d42a13f3d955312c9b, type: 3}
 --- !u!114 &5963552945249673892
 MonoBehaviour:
   m_ObjectHideFlags: 0

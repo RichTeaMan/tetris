@@ -2,10 +2,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class Timer : MonoBehaviour
 {
-    private GameState gameState;
+    private GameObject daemon;
 
     //private TimeSpan dropDuration = new TimeSpan(0,0,0,0,800);
     // 800ms
@@ -15,7 +16,7 @@ public class Timer : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        gameState = FindObjectOfType<GameState>();
+        daemon = GameObject.Find("Daemon");
         ResetTimer();
     }
 
@@ -24,7 +25,7 @@ public class Timer : MonoBehaviour
     {
         if (Time.time > dropTime)
         {
-            gameState.Gravity();
+            ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.Gravity());
             ResetTimer();
         }
     }

@@ -18,17 +18,9 @@ public class SpawnDaemon : MonoBehaviour, ISpawnerTarget
     public void SpawnRandomBlock()
     {
         Debug.Log("SPAWN!!!!");
-        var currentBlock = GameObject.Find(Constants.CURRENT_BLOCK_NAME);
-        if (currentBlock != null) {
-            currentBlock.name = "";
-            gameState.SetBlock(currentBlock);
 
-            foreach(Transform child in currentBlock.transform) {
-            Instantiate(destroyPrefab, child.position, Quaternion.identity);
-            }
-        }
 
-        var newBlock = new GameObject(Constants.CURRENT_BLOCK_NAME);        
+        var newBlock = new GameObject(Constants.CURRENT_BLOCK_NAME);
 
         var subs = new[] {
             Instantiate(blockPrefab, new Vector3(0, -1, 0), Quaternion.identity, newBlock.transform),
@@ -38,6 +30,7 @@ public class SpawnDaemon : MonoBehaviour, ISpawnerTarget
         };
         var spawnPoint = gameState.FetchSpawnPoint();
         newBlock.transform.position = spawnPoint;
+        Debug.Log($"COUNT!!!! {newBlock.transform.childCount}");
     }
 
     // Update is called once per frame

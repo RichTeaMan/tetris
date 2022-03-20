@@ -13,7 +13,11 @@ public class GameState : MonoBehaviour
 
     public GameObject blockPrefab;
 
+    public GameObject destroyPrefab;
+
     private HashSet<Point> setBlocks = new HashSet<Point>();
+
+    private LinkedList<GameObject> blocks = new LinkedList<GameObject>();
 
     private GameObject daemon;
 
@@ -150,18 +154,41 @@ public class GameState : MonoBehaviour
         }
         else
         {
+            foreach (Transform child in currentBlock.transform)
+            {
+                SetSubBlock(child.gameObject);
+                Instantiate(destroyPrefab, child.position, Quaternion.identity);
+            }
+            currentBlock.name = "";
+            currentBlock.transform.DetachChildren();
+            Destroy(currentBlock);
+
+            // check for completed lines
+            var completedIndexes = setBlocks.Select(p => p.Y).Distinct().Where(i => setBlocks.Count(p => p.Y == i) == Width).ToArray();
+            Debug.Log(completedIndexes);
+            foreach (var i in completedIndexes)
+            {
+                foreach (var block in blocks.Where(b => Convert.ToInt32(b.transform.position.y) == i).ToArray())
+                {
+                    blocks.Remove(block);
+                    Destroy(block);
+                    Instantiate(destroyPrefab, block.transform.position, Quaternion.identity);
+                }
+            }
+
+
+
+            
             ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
         }
     }
 
-    public void SetBlock(GameObject block)
+    public void SetSubBlock(GameObject block)
     {
-        Debug.Log(block.transform.position);
-        foreach (Transform child in block.transform)
-        {
-            var point = new Point((int)child.position.x, (int)child.position.y);
-            Debug.Log(point);
-            setBlocks.Add(point);
-        }
+        var point = new Point(Convert.ToInt32(block.transform.position.x), Convert.ToInt32(block.transform.position.y));
+        Debug.Log(point);
+        setBlocks.Add(point);
+
+        blocks.AddLast(block);
     }
 }
