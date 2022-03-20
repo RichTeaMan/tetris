@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 5256762358735207566}
   - component: {fileID: 6075337850216702156}
   - component: {fileID: 2775104547727139785}
+  - component: {fileID: -7168800823006085383}
   m_Layer: 0
   m_Name: Daemon
   m_TagString: Untagged
@@ -70,4 +71,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3faf10cb845eb714a9c95d2fc503c88f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  blockPrefab: {fileID: 7885672676497553557, guid: f4613c691e0f20247b82ef554cdd5c9c, type: 3}
+--- !u!114 &-7168800823006085383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6644018414778657484}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8c2314a18d35e0b4fa8a198fb435c30c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Height: 20
+  Width: 10
   blockPrefab: {fileID: 7885672676497553557, guid: f4613c691e0f20247b82ef554cdd5c9c, type: 3}

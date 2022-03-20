@@ -14,10 +14,15 @@ public class Controls : MonoBehaviour
 
     private bool dropRequested = false;
 
+    private GameState gameState;
+
+    private GameObject daemon;
+
     // Start is called before the first frame update
     void Start()
     {
-
+        gameState = FindObjectOfType<GameState>();
+        daemon = GameObject.Find("Daemon");
     }
 
     // Update is called once per frame
@@ -35,7 +40,6 @@ public class Controls : MonoBehaviour
         }
         if (dropRequested)
         {
-            var daemon = GameObject.Find("Daemon");
             ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
             dropRequested = false;
             return;
@@ -44,7 +48,7 @@ public class Controls : MonoBehaviour
         var currentBlock = GameObject.Find("CurrentBlock");
         if (currentBlock == null)
         {
-            Debug.LogError("Current block could not be found.");
+            ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
             return;
         }
 
@@ -53,19 +57,19 @@ public class Controls : MonoBehaviour
             //currentBlock.transform.Translate(Vector3.forward * Time.deltaTime);  
         }
 
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.DownArrow) && gameState.CanMoveDown(currentBlock))
         {
             var targetPosition = (Vector3.down * blockMove) + currentBlock.transform.position;
             StartCoroutine(MoveBlock(currentBlock, targetPosition));
         }
 
-        if (Input.GetKey(KeyCode.LeftArrow))
+        if (Input.GetKey(KeyCode.LeftArrow) && gameState.CanMoveLeft(currentBlock))
         {
             var targetPosition = (Vector3.left * blockMove) + currentBlock.transform.position;
             StartCoroutine(MoveBlock(currentBlock, targetPosition));
         }
 
-        if (Input.GetKey(KeyCode.RightArrow))
+        if (Input.GetKey(KeyCode.RightArrow) && gameState.CanMoveRight(currentBlock))
         {
             var targetPosition = (Vector3.right * blockMove) + currentBlock.transform.position;
             StartCoroutine(MoveBlock(currentBlock, targetPosition));
@@ -84,8 +88,6 @@ public class Controls : MonoBehaviour
             var q = Quaternion.FromToRotation(Vector3.up, Vector3.left) * currentBlock.transform.rotation;
             StartCoroutine(RotateBlock(currentBlock, q));
         }
-
-
     }
 
     private IEnumerator MoveBlock(GameObject currentBlock, Vector3 targetPosition)
