@@ -29,7 +29,8 @@ public class Controls : MonoBehaviour
         // drop
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
+            //ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
+            ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.Gravity());
             return;
         }
 

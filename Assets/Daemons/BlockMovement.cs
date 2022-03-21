@@ -18,6 +18,8 @@ public class BlockMovement : MonoBehaviour, IBlockMovement
 
     private GameObject daemon;
 
+    private int massMovementInProgress = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -95,11 +97,35 @@ public class BlockMovement : MonoBehaviour, IBlockMovement
         StartCoroutine(RotateBlock(currentBlock, q));
     }
 
-    //public void MoveBlocksDown(GameObject[] blocks){}
+    public void MoveBlocksDown(GameObject[] blocks, int lineCount)
+    {
+        var movementAmount = (Vector3.down * blockMove * (float)lineCount);
+        foreach (var block in blocks)
+        {
+            var targetPosition = movementAmount + block.transform.position;
+            StartCoroutine(MoveBlockWithoutLock(block, targetPosition));
+        }
+    }
+
+    public bool IsMovementInProgress()
+    {
+        return movementLocked || massMovementInProgress > 0;
+    }
 
     private IEnumerator MoveBlock(GameObject currentBlock, Vector3 targetPosition)
     {
         movementLocked = true;
+        var enumerator = MoveBlockWithoutLock(currentBlock, targetPosition);
+        while (enumerator.MoveNext())
+        {
+            yield return enumerator.Current;
+        }
+        movementLocked = false;
+    }
+
+    private IEnumerator MoveBlockWithoutLock(GameObject currentBlock, Vector3 targetPosition)
+    {
+        massMovementInProgress++;
         float timeElapsed = 0;
         Vector3 startPosition = currentBlock.transform.position;
         while (timeElapsed < duration)
@@ -109,7 +135,7 @@ public class BlockMovement : MonoBehaviour, IBlockMovement
             yield return null;
         }
         currentBlock.transform.position = targetPosition;
-        movementLocked = false;
+        massMovementInProgress--;
     }
 
     private IEnumerator RotateBlock(GameObject currentBlock, Quaternion targetRotation)

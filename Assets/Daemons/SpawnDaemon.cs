@@ -10,32 +10,48 @@ public class SpawnDaemon : MonoBehaviour, ISpawnerTarget
 
     private GameState gameState;
 
+    private BlockMovement blockMovement;
+
+    private bool spawnRequested = false;
+
     // Start is called before the first frame update
     void Start()
     {
         gameState = FindObjectOfType<GameState>();
+        blockMovement = FindObjectOfType<BlockMovement>();
     }
     public void SpawnRandomBlock()
     {
-        Debug.Log("SPAWN!!!!");
-
-
-        var newBlock = new GameObject(Constants.CURRENT_BLOCK_NAME);
-
-        var subs = new[] {
-            Instantiate(blockPrefab, new Vector3(0, -1, 0), Quaternion.identity, newBlock.transform),
-            Instantiate(blockPrefab, new Vector3(0, 0, 0), Quaternion.identity, newBlock.transform),
-            Instantiate(blockPrefab, new Vector3(0, 1, 0), Quaternion.identity, newBlock.transform),
-            Instantiate(blockPrefab, new Vector3(0, 2, 0), Quaternion.identity, newBlock.transform)
-        };
-        var spawnPoint = gameState.FetchSpawnPoint();
-        newBlock.transform.position = spawnPoint;
-        Debug.Log($"COUNT!!!! {newBlock.transform.childCount}");
+        spawnRequested = true;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (spawnRequested && !blockMovement.IsMovementInProgress())
+        {
+            Debug.Log("Spawning block");
 
+            var newBlock = new GameObject(Constants.CURRENT_BLOCK_NAME);
+
+            int randomNumber = Random.Range(0, 7);
+
+            // I piece
+            //if (randomNumber == 0)
+            {
+                newBlock.transform.position = new Vector3(0.5f, -0.5f, 0);
+
+                var subs = new[] {
+                    Instantiate(blockPrefab, new Vector3(-1, 0, 0), Quaternion.identity, newBlock.transform),
+                    Instantiate(blockPrefab, new Vector3(0, 0, 0), Quaternion.identity, newBlock.transform),
+                    Instantiate(blockPrefab, new Vector3(1, 0, 0), Quaternion.identity, newBlock.transform),
+                    Instantiate(blockPrefab, new Vector3(2, 0, 0), Quaternion.identity, newBlock.transform)
+                };
+                //var spawnPoint = gameState.FetchSpawnPoint();
+                var spawnPoint = new Vector3(4.5f, 0.5f, 0);
+                newBlock.transform.position = spawnPoint;
+            }
+            spawnRequested = false;
+        }
     }
 }

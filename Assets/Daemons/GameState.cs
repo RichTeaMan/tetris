@@ -62,8 +62,6 @@ public class GameState : MonoBehaviour
 
     public bool CanMoveLeft(GameObject block)
     {
-        float originX = block.transform.position.x;
-        float originY = block.transform.position.y;
         foreach (Transform child in block.transform)
         {
             var point = new Point(Convert.ToInt32(child.position.x) - 1, Convert.ToInt32(child.position.y));
@@ -165,20 +163,65 @@ public class GameState : MonoBehaviour
 
             // check for completed lines
             var completedIndexes = setBlocks.Select(p => p.Y).Distinct().Where(i => setBlocks.Count(p => p.Y == i) == Width).ToArray();
-            Debug.Log(completedIndexes);
-            foreach (var i in completedIndexes)
+
+            if (completedIndexes.Length > 0)
             {
-                foreach (var block in blocks.Where(b => Convert.ToInt32(b.transform.position.y) == i).ToArray())
+                var blockLinesToMove = blocks.ToDictionary(k => k, v => 0); //new Dictionary<GameObject, int>();
+
+
+                foreach (var i in completedIndexes)
                 {
-                    blocks.Remove(block);
-                    Destroy(block);
-                    Instantiate(destroyPrefab, block.transform.position, Quaternion.identity);
+                    foreach (var block in blocks.Where(b => Convert.ToInt32(b.transform.position.y) == i).ToArray())
+                    {
+                        blocks.Remove(block);
+                        Destroy(block);
+                        blockLinesToMove.Remove(block);
+                        Instantiate(destroyPrefab, block.transform.position, Quaternion.identity);
+                    }
+
+                    // get all blocks that will need to move down
+                    foreach (var block in blocks.Where(b => Convert.ToInt32(b.transform.position.y) > i).ToArray())
+                    {
+                        blockLinesToMove[block]++;
+                    }
+                }
+
+                // correct setBlocks
+                int correction = 0;
+                HashSet<Point> updatePoints = new HashSet<Point>();
+                foreach (var i in Enumerable.Range(0, Height))
+                {
+                    int y = -(Height - i);
+                    if (completedIndexes.Contains(y))
+                    {
+                        correction++;
+                    }
+                    else
+                    {
+                        var rowPoints = setBlocks.Where(p => p.Y == y).ToArray();
+                        foreach (var p in rowPoints.Select(p => new Point(p.X, p.Y - correction)))
+                        {
+                            updatePoints.Add(p);
+                        }
+                    }
+                }
+                setBlocks = updatePoints;
+
+                // move rendered blocks
+                var blocksByLineMovement = new Dictionary<int, List<GameObject>>();
+                foreach (var kv in blockLinesToMove.Where(kv => kv.Value > 0))
+                {
+                    if (!blocksByLineMovement.ContainsKey(kv.Value))
+                    {
+                        blocksByLineMovement[kv.Value] = new List<GameObject>();
+                    }
+                    blocksByLineMovement[kv.Value].Add(kv.Key);
+                }
+                foreach (var lineBlocks in blocksByLineMovement)
+                {
+                    ExecuteEvents.Execute<IBlockMovement>(daemon, null, (x, y) => x.MoveBlocksDown(lineBlocks.Value.ToArray(), lineBlocks.Key));
                 }
             }
-
-
-
-            
             ExecuteEvents.Execute<ISpawnerTarget>(daemon, null, (x, y) => x.SpawnRandomBlock());
         }
     }
@@ -186,7 +229,6 @@ public class GameState : MonoBehaviour
     public void SetSubBlock(GameObject block)
     {
         var point = new Point(Convert.ToInt32(block.transform.position.x), Convert.ToInt32(block.transform.position.y));
-        Debug.Log(point);
         setBlocks.Add(point);
 
         blocks.AddLast(block);

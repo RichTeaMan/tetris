@@ -1,3 +1,4 @@
+using UnityEngine;
 using UnityEngine.EventSystems;
 
 public interface IBlockMovement : IEventSystemHandler
@@ -13,4 +14,6 @@ public interface IBlockMovement : IEventSystemHandler
     void RotateClockwise();
 
     void RotateCounterClockwise();
+
+    void MoveBlocksDown(GameObject[] blocks, int lineCount);
 }
