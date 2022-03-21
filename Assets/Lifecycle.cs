@@ -4,18 +4,18 @@ using UnityEngine;
 
 public class Lifecycle : MonoBehaviour
 {
-    private ParticleSystem particleSystem;
+    private ParticleSystem explodeParticles;
     // Start is called before the first frame update
     void Start()
     {
-        particleSystem = GetComponent<ParticleSystem>();
+        explodeParticles = GetComponent<ParticleSystem>();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (!particleSystem.IsAlive()) {
-            Destroy(this);
+        if (!explodeParticles.IsAlive()) {            
+            Destroy(this.gameObject);
         }
     }
 }
